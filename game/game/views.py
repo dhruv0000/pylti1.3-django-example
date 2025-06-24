@@ -67,8 +67,13 @@ def login(request):
     tool_conf = get_tool_conf()
     launch_data_storage = get_launch_data_storage()
 
+    pprint.pprint('Tool Config:')
+    # pprint.pprint(tool_conf.get_json())
+
     oidc_login = DjangoOIDCLogin(request, tool_conf, launch_data_storage=launch_data_storage)
     target_link_uri = get_launch_url(request)
+    pprint.pprint('Target Link:')
+    # pprint.pprint(oidc_login.get_json())
     return oidc_login\
         .enable_check_cookies()\
         .redirect(target_link_uri)
@@ -80,10 +85,13 @@ def launch(request):
     launch_data_storage = get_launch_data_storage()
     message_launch = ExtendedDjangoMessageLaunch(request, tool_conf, launch_data_storage=launch_data_storage)
     message_launch_data = message_launch.get_launch_data()
+    pprint.pprint('Launch data:')
     pprint.pprint(message_launch_data)
 
     difficulty = message_launch_data.get('https://purl.imsglobal.org/spec/lti/claim/custom', {})\
         .get('difficulty', None)
+    
+
     if not difficulty:
         difficulty = request.GET.get('difficulty', 'normal')
 
@@ -193,6 +201,8 @@ def scoreboard(request, launch_id):
     launch_data_storage = get_launch_data_storage()
     message_launch = ExtendedDjangoMessageLaunch.from_cache(launch_id, request, tool_conf,
                                                             launch_data_storage=launch_data_storage)
+    pprint.pprint(message_launch.get_launch_data())
+    
     resource_link_id = message_launch.get_launch_data() \
         .get('https://purl.imsglobal.org/spec/lti/claim/resource_link', {}).get('id')
 
